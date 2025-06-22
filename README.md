@@ -1,0 +1,2 @@
+# LALOTO
+game of lotery
