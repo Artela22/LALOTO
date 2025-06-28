@@ -1,17 +1,18 @@
 #include <stdio.h>
 #include <stdlib.h>  // Para system("cls") en Windows
-#include <conio.h>   // Para _getch() si usas Windows
-
+#include <conio.h>   // Para _getch() 
 void mostrarMenu();
-void ingresarGanadores();   // Placeholder
-void ingresarBoletos();     // Placeholder
-void mostrarResumen();      // Placeholder
+void ingresarGanadores();   
+void ingresarBoletos();     
+void mostrarResumen();      
 
 int main() {
     int opcion;
 
     do {
+        
         system("cls"); // Limpia pantalla (en Windows)
+        
         mostrarMenu();
         printf("\nSeleccione una opción: ");
         scanf("%d", &opcion);
@@ -53,16 +54,16 @@ void mostrarMenu() {
     printf("============================================\n");
 }
 
-// Funciones de prueba (a completar por ti)
+// Funciones de prueba 
 void ingresarGanadores() {
-    printf("\n>> Esta función permitirá ingresar los números ganadores. (Futura implementación)");
+   
 }
 
 void ingresarBoletos() {
-    printf("\n>> Esta función permitirá ingresar los boletos. (Futura implementación)");
+   
 }
 
 void mostrarResumen() {
-    printf("\n>> Esta función mostrará el resumen de resultados. (Futura implementación)");
+   
 }
 
