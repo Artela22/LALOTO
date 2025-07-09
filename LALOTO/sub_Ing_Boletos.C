@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-int main() // funcion para  ingresar los boletos (maximo 10)
+int boleros_ganadores() // funcion para  ingresar los boletos (maximo 10)
 {
     int B[6][10], C, C_B, Ve[6];//Boletos, Contador(para los 6 numeros del boleto), Contador de boletos, Verificacion
     for (C_B=0;C_B<10;C_B++)//matriz para llevar la cuenta de los boletos
