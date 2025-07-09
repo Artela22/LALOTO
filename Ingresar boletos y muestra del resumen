@@ -1,1 +1,249 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <ctype.h>
+#include <unistd.h> // Para usleep (Linux) o Sleep (Windows)
+
+// Definiciones
+#define MAX_NUM 38
+#define NUM_WINNERS 6
+#define MAX_TICKETS 10
+
+// Colores ANSI
+#define COLOR_RED     "\x1b[31m"
+#define COLOR_GREEN   "\x1b[32m"
+#define COLOR_YELLOW  "\x1b[33m"
+#define COLOR_BLUE    "\x1b[34m"
+#define COLOR_MAGENTA "\x1b[35m"
+#define COLOR_CYAN    "\x1b[36m"
+#define COLOR_WHITE   "\x1b[37m"
+#define COLOR_RESET   "\x1b[0m"
+#define BG_BLUE       "\x1b[44m"
+#define BG_RED        "\x1b[41m"
+#define COLOR_BLACK "\x1b[41m"
+#define BG_YELLOW     "\x1b[43m"
+
+// Limpiar pantalla según SO
+void clearScreen() {
+    #ifdef _WIN32
+        system("cls");
+    #else
+        system("clear");
+    #endif
+}
+
+// Animación de carga
+void mostrarLoading() {
+    clearScreen();
+    printf("\n%sCARGANDO LOTERIA NACIONAL DE PANAMA%s\n", BG_BLUE COLOR_WHITE, COLOR_RESET);
+    for(int i = 0; i < 3; i++) {
+        printf("\n%s  %s  %s  \n", BG_YELLOW COLOR_BLACK, BG_RED COLOR_WHITE, BG_BLUE COLOR_WHITE);
+        usleep(300000);
+        clearScreen();
+    }
+}
+
+// Mostrar logo Loto Panama
+void mostrarLogo() {
+    printf("\n");
+    printf("%s=====================================================%s\n", COLOR_YELLOW, COLOR_RESET);
+    printf("%s|  %s   _       _____   _____          %s  |%s\n", COLOR_YELLOW, COLOR_WHITE, COLOR_YELLOW, COLOR_RESET);
+    printf("%s|  %s  | |     |_   _| /  ___| %s       %s  |%s\n", COLOR_YELLOW, COLOR_WHITE, COLOR_BLUE, COLOR_YELLOW, COLOR_RESET);
+    printf("%s|  %s  | |       | |   \\ `--.  %s _ __  %s  |%s\n", COLOR_YELLOW, COLOR_WHITE, COLOR_BLUE, COLOR_YELLOW, COLOR_RESET);
+    printf("%s|  %s  | |       | |    `--. \\ %s| '_ \\ %s  |%s\n", COLOR_YELLOW, COLOR_WHITE, COLOR_BLUE, COLOR_YELLOW, COLOR_RESET);
+    printf("%s|  %s  | |____  _| |_  /\\__/ / %s| |_) |%s  |%s\n", COLOR_YELLOW, COLOR_WHITE, COLOR_BLUE, COLOR_YELLOW, COLOR_RESET);
+    printf("%s|  %s  \\_____/  \\___/  \\____/  %s| .__/ %s  |%s\n", COLOR_YELLOW, COLOR_WHITE, COLOR_BLUE, COLOR_YELLOW, COLOR_RESET);
+    printf("%s|  %s                           %s|_|    %s  |%s\n", COLOR_YELLOW, COLOR_WHITE, COLOR_BLUE, COLOR_YELLOW, COLOR_RESET);
+    printf("%s|%s                                                 %s|%s\n", COLOR_YELLOW, COLOR_RESET, COLOR_YELLOW, COLOR_RESET);
+    printf("%s|%s    OFICIAL - LOTERIA NACIONAL DE PANAMA        %s|%s\n", COLOR_YELLOW, COLOR_WHITE, COLOR_YELLOW, COLOR_RESET);
+    printf("%s=====================================================%s\n\n", COLOR_YELLOW, COLOR_RESET);
+}
+
+// Mostrar reglas del juego
+void mostrarReglas() {
+    printf("%s-----------------------------------------------%s\n", COLOR_CYAN, COLOR_RESET);
+    printf("%s           REGLAS DEL JUEGO - LOTO            %s\n", COLOR_CYAN, COLOR_RESET);
+    printf("%s-----------------------------------------------%s\n", COLOR_CYAN, COLOR_RESET);
+    printf("%s1. Selecciona 6 numeros entre 1 y 38.%s\n", COLOR_WHITE, COLOR_RESET);
+    printf("%s2. No se permiten numeros repetidos.%s\n", COLOR_WHITE, COLOR_RESET);
+    printf("%s3. Puedes ingresar hasta %d boletos.%s\n", COLOR_WHITE, MAX_TICKETS, COLOR_RESET);
+    printf("%s4. Premios:%s\n", COLOR_WHITE, COLOR_RESET);
+    printf("%s   - 3 aciertos: $5.00%s\n", COLOR_YELLOW, COLOR_RESET);
+    printf("%s   - 4 aciertos: $50.00%s\n", COLOR_YELLOW, COLOR_RESET);
+    printf("%s   - 5 aciertos: $1,500.00%s\n", COLOR_YELLOW, COLOR_RESET);
+    printf("%s   - 6 aciertos: $500,000.00%s\n", COLOR_YELLOW, COLOR_RESET);
+    printf("%s-----------------------------------------------%s\n\n", COLOR_CYAN, COLOR_RESET);
+}
+
+// Cargar números ganadores
+void cargarNumerosGanadores(int ganadores[NUM_WINNERS]) {
+    int num, i = 0;
+    int numerosElegidos[MAX_NUM + 1] = {0};
+
+    srand(time(NULL));
+
+    while(i < NUM_WINNERS) {
+        num = rand() % MAX_NUM + 1;
+        if(!numerosElegidos[num]) {
+            ganadores[i] = num;
+            numerosElegidos[num] = 1;
+            i++;
+        }
+    }
+}
+
+// Validar boleto
+int validarBoleto(int boleto[NUM_WINNERS]) {
+    int numerosElegidos[MAX_NUM + 1] = {0};
+    
+    for(int i = 0; i < NUM_WINNERS; i++) {
+        if(boleto[i] < 1 || boleto[i] > MAX_NUM) {
+            printf("%sError: Numero debe estar entre 01 y 38\n%s", COLOR_RED, COLOR_RESET);
+            return 0;
+        }
+        if(numerosElegidos[boleto[i]]) {
+            printf("%sError: Numero %d repetido\n%s", COLOR_RED, boleto[i], COLOR_RESET);
+            return 0;
+        }
+        numerosElegidos[boleto[i]] = 1;
+    }
+    return 1;
+}
+
+// Comparar boletos
+int compararBoletos(int boleto[NUM_WINNERS], int ganadores[NUM_WINNERS]) {
+    int aciertos = 0;
+    for(int i = 0; i < NUM_WINNERS; i++) {
+        for(int j = 0; j < NUM_WINNERS; j++) {
+            if(boleto[i] == ganadores[j]) {
+                aciertos++;
+                break;
+            }
+        }
+    }
+    return aciertos;
+}
+
+// Mostrar números formateados
+void mostrarNumeros(int nums[NUM_WINNERS], char* color) {
+    printf("%s", color);
+    for(int i = 0; i < NUM_WINNERS; i++) {
+        printf("[%02d] ", nums[i]);
+    }
+    printf("%s", COLOR_RESET);
+}
+
+// Mostrar menu principal
+void mostrarMenu() {
+    printf("\n%s=====================================================%s\n", COLOR_BLUE, COLOR_RESET);
+    printf("%s|                MENU PRINCIPAL - LOTO              |%s\n", COLOR_BLUE, COLOR_RESET);
+    printf("%s=====================================================%s\n", COLOR_BLUE, COLOR_RESET);
+    printf("%s|%s 1. Ingresar nuevo boleto                        %s|%s\n", COLOR_BLUE, COLOR_WHITE, COLOR_BLUE, COLOR_RESET);
+    printf("%s|%s 2. Ver numeros ganadores                        %s|%s\n", COLOR_BLUE, COLOR_WHITE, COLOR_BLUE, COLOR_RESET);
+    printf("%s|%s 3. Mostrar reglas del juego                     %s|%s\n", COLOR_BLUE, COLOR_WHITE, COLOR_BLUE, COLOR_RESET);
+    printf("%s|%s 4. Salir                                        %s|%s\n", COLOR_BLUE, COLOR_WHITE, COLOR_BLUE, COLOR_RESET);
+    printf("%s=====================================================%s\n", COLOR_BLUE, COLOR_RESET);
+    printf("Seleccione una opcion: ");
+}
+
+int main() {
+    int ganadores[NUM_WINNERS];
+    int boletos[MAX_TICKETS][NUM_WINNERS] = {0};
+    int totalBoletos = 0;
+    int premios[7] = {0}; // Para contar premios de 0 a 6 aciertos
+    float totalPremios = 0.00;
+    int opcion;
+
+    // Cargar numeros ganadores
+    cargarNumerosGanadores(ganadores);
+    mostrarLogo();
+    mostrarReglas();
+
+    do {
+        mostrarMenu();
+        scanf("%d", &opcion);
+
+        switch(opcion) {
+            case 1: // Ingresar nuevo boleto
+                if(totalBoletos >= MAX_TICKETS) {
+                    printf("%sYa ingresaste el maximo de %d boletos permitidos.%s\n", COLOR_RED, MAX_TICKETS, COLOR_RESET);
+                    break;
+                }
+
+                printf("\nIngrese 6 numeros unicos entre 01 y 38:\n");
+                int boletoValido = 0;
+                int intentos = 0;
+                int maxIntentos = 3;
+
+                while(!boletoValido && intentos < maxIntentos) {
+                    printf("\nIntento %d/%d:\n", intentos + 1, maxIntentos);
+                    for(int i = 0; i < NUM_WINNERS; i++) {
+                        printf("Numero %d: ", i + 1);
+                        scanf("%d", &boletos[totalBoletos][i]);
+                    }
+
+                    if(validarBoleto(boletos[totalBoletos])) {
+                        boletoValido = 1;
+                    } else {
+                        intentos++;
+                        if(intentos < maxIntentos) {
+                            printf("%sIntente nuevamente...\n%s", COLOR_YELLOW, COLOR_RESET);
+                        }
+                    }
+                }
+
+                if(boletoValido) {
+                    int aciertos = compararBoletos(boletos[totalBoletos], ganadores);
+                    float premio = 0.00;
+
+                    switch(aciertos) {
+                        case 3: premio = 5.00; break;
+                        case 4: premio = 50.00; break;
+                        case 5: premio = 1500.00; break;
+                        case 6: premio = 500000.00; break;
+                    }
+
+                    premios[aciertos]++;
+                    totalPremios += premio;
+                    totalBoletos++;
+
+                    printf("\n%sResultado del boleto %d:\n%s", COLOR_GREEN, totalBoletos, COLOR_RESET);
+                    printf("Tus numeros: ");
+                    mostrarNumeros(boletos[totalBoletos - 1], COLOR_YELLOW);
+                    printf("\nAciertos: %d - ", aciertos);
+                    
+                    if(premio > 0) {
+                        printf("%sPremio: $%.2f\n%s", COLOR_GREEN, premio, COLOR_RESET);
+                    } else {
+                        printf("%sNo ganaste\n%s", COLOR_RED, COLOR_RESET);
+                    }
+                } else {
+                    printf("%sDemasiados intentos fallidos. Boleto descartado.\n%s", COLOR_RED, COLOR_RESET);
+                }
+                break;
+
+            case 2: // Ver numeros ganadores
+                printf("\n%sNumeros ganadores: ", COLOR_CYAN);
+                mostrarNumeros(ganadores, COLOR_GREEN);
+                printf("%s\n", COLOR_RESET);
+                break;
+
+            case 3: // Mostrar reglas del juego
+                mostrarReglas();
+                break;
+
+            case 4: // Salir
+                printf("%sGracias por usar el simulador de Loto!%s\n", COLOR_BLUE, COLOR_RESET);
+                break;
+
+            default:
+                printf("%sOpcion no valida. Intente de nuevo.%s\n", COLOR_RED, COLOR_RESET);
+        }
+    } while(opcion != 4);
+
+    return 0;
+}
+
+
+
 
